@@ -110,8 +110,10 @@ ok($seen_test_instance == 1, "Checking for newly run instance");
 # create tags
 my $create_tags_result = $ec2->create_tags(
     ResourceId  => $instance_id,
-    'Tag.Key'   => ["Name","test_tag_key"],
-    'Tag.Value' => ["hoge","test_tag_value"],
+    Tags        => { 
+                Name => 'hoge',
+        test_tag_key => 'test_tag_value',
+    },
 );
 ok($create_tags_result == 1, "Checking for created tags");
 

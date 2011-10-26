@@ -39,7 +39,7 @@ has 'reservation_id'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'owner_id'			=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'group_set'			=> ( 
     is			=> 'ro', 
-    isa			=> 'ArrayRef[Net::Amazon::EC2::GroupSet]',
+    isa			=> 'ArrayRef[Net::Amazon::EC2::GroupSet] | Undef',
     required	=> 1,
     auto_deref	=> 1,
 );

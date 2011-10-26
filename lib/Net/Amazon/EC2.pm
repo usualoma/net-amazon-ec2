@@ -10,7 +10,7 @@ use Digest::HMAC_SHA1;
 use URI;
 use MIME::Base64 qw(encode_base64 decode_base64);
 use HTTP::Date qw(time2isoz);
-use Params::Validate qw(validate SCALAR ARRAYREF);
+use Params::Validate qw(validate SCALAR ARRAYREF HASHREF);
 use Data::Dumper qw(Dumper);
 
 use Net::Amazon::EC2::DescribeImagesResponse;
@@ -860,19 +860,15 @@ Creates tags.
 
 =item ResourceId (required)
 
-The ID of the resource to create tags
+The ID of the resource to create tags. Can be a scalar or arrayref
 
-=item Tag.Key (required)
+=item Tags (required)
 
-Key for a tag, may pass in a scalar or arrayref.
-
-=item Tag.Value (required)
-
-Value for a tag, may pass in a scalar or arrayref.
+Hashref where keys and values will be set on all resources given in the first element.
 
 =back
 
-Returns true if the releasing succeeded.
+Returns true if the tag creation succeeded.
 
 =cut
 
@@ -880,8 +876,7 @@ sub create_tags {
 	my $self = shift;
 	my %args = validate( @_, {
 		ResourceId				=> { type => ARRAYREF | SCALAR },
-		'Tag.Key'				=> { type => ARRAYREF | SCALAR },
-		'Tag.Value'				=> { type => ARRAYREF | SCALAR },
+		Tags				    => { type => HASHREF },
 	});
 
         if (ref ($args{'ResourceId'}) eq 'ARRAY') {
@@ -896,22 +891,13 @@ sub create_tags {
                 $args{"ResourceId.1"} = delete $args{'ResourceId'};
         }
 
-	# If we have a array ref of keys lets split them out into their Tag.n.Key format
-	if (ref ($args{'Tag.Key'}) eq 'ARRAY') {
-		my $keys			= delete $args{'Tag.Key'};
+	if (ref ($args{'Tags'}) eq 'HASH') {
 		my $count			= 1;
-		foreach my $key (@{$keys}) {
+        my $tags = delete $args{'Tags'};
+		foreach my $key ( keys %{$tags} ) {
+            last if $count > 10;
 			$args{"Tag." . $count . ".Key"} = $key;
-			$count++;
-		}
-	}
-
-	# If we have a array ref of values lets split them out into their Tag.n.Value format
-	if (ref ($args{'Tag.Value'}) eq 'ARRAY') {
-		my $values			= delete $args{'Tag.Value'};
-		my $count			= 1;
-		foreach my $value (@{$values}) {
-			$args{"Tag." . $count . ".Value"} = $value;
+			$args{"Tag." . $count . ".Value"} = $tags->{$key};
 			$count++;
 		}
 	}
@@ -1793,6 +1779,9 @@ sub describe_instances {
 
 				my $tag_sets;
 				foreach my $tag_arr (@{$instance_elem->{tagSet}{item}}) {
+                    if ( ref $tag_arr->{value} eq "HASH" ) {
+                        $tag_arr->{value} = "";
+                    }
 					my $tag = Net::Amazon::EC2::TagSet->new(
 						key => $tag_arr->{key},
 						value => $tag_arr->{value},
