@@ -68,8 +68,8 @@ environment.
 
 =head1 VERSION
 
-This document describes version 0.14 of Net::Amazon::EC2, released
-February 1st, 2010. This module is coded against the Query API version of the '2011-01-01' 
+This document describes version 0.15 of Net::Amazon::EC2, released
+January 18, 2012. This module is coded against the Query API version of the '2011-01-01' 
 version of the EC2 API last updated January 1st, 2011.
 
 =head1 SYNOPSIS
