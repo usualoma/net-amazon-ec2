@@ -214,6 +214,7 @@ sub _sign {
 	my $ur	= $uri->as_string();
 	$self->_debug("GENERATED QUERY URL: $ur");
 	my $ua	= LWP::UserAgent->new();
+    $ua->env_proxy;
 	my $res	= $ua->post($ur, \%params);
 	# We should force <item> elements to be in an array
 	my $xs	= XML::Simple->new(ForceArray => qr/(?:item|Errors)/i, KeyAttr => '');
