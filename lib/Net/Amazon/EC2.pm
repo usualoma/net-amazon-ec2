@@ -1707,7 +1707,7 @@ sub describe_instances {
 	}
 	else {
 		foreach my $reservation_set (@{$xml->{reservationSet}{item}}) {
-			my $group_sets;
+			my $group_sets=[];
 			foreach my $group_arr (@{$reservation_set->{groupSet}{item}}) {
 				my $group = Net::Amazon::EC2::GroupSet->new(
 					group_id => $group_arr->{groupId},
@@ -3691,7 +3691,7 @@ sub run_instances {
 		return $self->_parse_errors($xml);
 	}
 	else {
-		my $group_sets;
+		my $group_sets=[];
 		foreach my $group_arr (@{$xml->{groupSet}{item}}) {
 			my $group = Net::Amazon::EC2::GroupSet->new(
 				group_id => $group_arr->{groupId},
