@@ -17,5 +17,9 @@ requires		'XML::Simple'		=> 2.18;
 requires        'Moose'             => 0.38;
 build_requires  'Test::More'        => 0;
 
+no_index;
+
+repository 'https://github.com/mrallen1/net-amazon-ec2';
+
 auto_install;
 WriteAll;

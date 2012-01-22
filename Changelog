@@ -1,4 +1,7 @@
 
+0.16    2012-01-21
+        Mark Allen      Remove union type in ReservationInfo
+
 0.15    2012-01-18
         Mark Allen      Fix groupSet params RT#67145
         Mark Allen      Support proxy environment variables RT#67145
