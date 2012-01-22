@@ -21,7 +21,7 @@ Unique ID attached to the reservation.
 
 AWS Account id of the person making the reservation.
 
-=item group_set (required)
+=item group_set
 
 An array ref of Net::Amazon::EC2::GroupSet objects.
 
@@ -39,8 +39,8 @@ has 'reservation_id'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'owner_id'			=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'group_set'			=> ( 
     is			=> 'ro', 
-    isa			=> 'ArrayRef[Net::Amazon::EC2::GroupSet] | Undef',
-    required	=> 1,
+    isa			=> 'ArrayRef[Net::Amazon::EC2::GroupSet]',
+    required	=> 0,
     auto_deref	=> 1,
 );
 has 'instances_set'		=> ( 
