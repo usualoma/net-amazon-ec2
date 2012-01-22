@@ -40,7 +40,7 @@ has 'owner_id'			=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'group_set'			=> ( 
     is			=> 'ro', 
     isa			=> 'ArrayRef[Net::Amazon::EC2::GroupSet]',
-    required	=> 0,
+    required	=> 1,
     auto_deref	=> 1,
 );
 has 'instances_set'		=> ( 
