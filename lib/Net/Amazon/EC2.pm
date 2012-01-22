@@ -420,7 +420,7 @@ This method adds permissions to a security group.  It takes the following parame
 
 The name of the group to add security rules to.
 
-=item SourceSecurityGroupName (requred when authorizing a user and group together)
+=item SourceSecurityGroupName (required when authorizing a user and group together)
 
 Name of the group to add access for.
 
@@ -3418,7 +3418,7 @@ This method revoke permissions to a security group.  It takes the following para
 
 The name of the group to revoke security rules from.
 
-=item SourceSecurityGroupName (requred when revoking a user and group together)
+=item SourceSecurityGroupName (required when revoking a user and group together)
 
 Name of the group to revoke access from.
 
