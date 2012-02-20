@@ -3592,6 +3592,10 @@ Enables monitoring for this instance.
 
 Specifies the subnet ID within which to launch the instance(s) for Amazon Virtual Private Cloud.
 
+=item ClientToken (optional)
+
+Specifies the idempotent instance id.
+
 =back
 
 Returns a Net::Amazon::EC2::ReservationInfo object
