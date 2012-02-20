@@ -3623,6 +3623,7 @@ sub run_instances {
 		SubnetId										=> { type => SCALAR, optional => 1 },
 		DisableApiTermination							=> { type => SCALAR, optional => 1 },
 		InstanceInitiatedShutdownBehavior				=> { type => SCALAR, optional => 1 },
+		ClientToken										=> { type => SCALAR, optional => 1 },
 	});
 	
 	# If we have a array ref of instances lets split them out into their SecurityGroup.n format
