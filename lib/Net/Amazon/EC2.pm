@@ -1693,6 +1693,12 @@ This method pulls a list of the instances which are running or were just running
 
 Either a scalar or an array ref can be passed in, will cause just these instances to be 'described'
 
+=item Filter (optional)
+
+The filters for only the matching instances to be 'described'.
+A filter tuple is an arrayref constsing one key and one or more values.
+The option takes one filter tuple, or an arrayref of multiple filter tuples.
+
 =back
 
 Returns an array ref of Net::Amazon::EC2::ReservationInfo objects
