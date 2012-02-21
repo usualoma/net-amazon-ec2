@@ -178,7 +178,6 @@ sub _sign {
 	my %args						= @_;
 	my $action						= delete $args{Action};
 	my %sign_hash					= %args;
-        $self->_clear_timestamp;
 	$sign_hash{AWSAccessKeyId}		= $self->AWSAccessKeyId;
 	$sign_hash{Action}				= $action;
 	$sign_hash{Timestamp}			= $self->timestamp;
