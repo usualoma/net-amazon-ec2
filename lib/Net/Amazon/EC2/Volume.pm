@@ -50,6 +50,14 @@ supports (only applies to volumes with a volume_type of io1).
 
 An array ref of Net:Amazon::EC2::Attachment objects.
 
+=item tag_set (optional)
+
+An array ref of Net::Amazon::EC2::TagSet objects.
+
+=item name (optional)
+
+The instance name from tags.
+
 =back
 
 =cut
@@ -65,6 +73,16 @@ has 'iops'              => ( is => 'ro', isa => 'Maybe[Int]');
 has 'encrypted'         => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
 has 'attachments'	=> ( is => 'ro', isa => 'Maybe[ArrayRef[Net::Amazon::EC2::Attachment]]', required => 0 );
 has 'tag_set'              => ( is => 'ro', isa => 'Maybe[ArrayRef[Net::Amazon::EC2::TagSet]]', required => 0 );
+has 'name' => (
+	is => 'ro',
+	lazy    => 1,
+	default => sub {
+		my $self = shift;
+		return '' if !$self->tag_set || scalar @{$self->tag_set} == 0;
+		my $name = (grep {$_->{key} eq 'Name'} @{$self->tag_set})[0];
+		return $name->{value} || '';
+	},
+);
 
 __PACKAGE__->meta->make_immutable();
 

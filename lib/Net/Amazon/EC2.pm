@@ -410,6 +410,24 @@ sub _build_filters {
 	}
 }
 
+sub _tag_set {
+	my ($self, $element) = @_;
+
+	my @tag_sets;
+	foreach my $tag_arr (@{$element->{tagSet}{item}}) {
+		if ( ref $tag_arr->{value} eq "HASH" ) {
+			$tag_arr->{value} = "";
+		}
+		my $tag = Net::Amazon::EC2::TagSet->new(
+			key => $tag_arr->{key},
+			value => $tag_arr->{value},
+		);
+		push @tag_sets, $tag;
+	}
+
+	\@tag_sets;
+}
+
 =head1 OBJECT METHODS
 
 =head2 allocate_address()
@@ -1961,18 +1979,6 @@ sub describe_instances {
 				
 				my $placement_response = Net::Amazon::EC2::PlacementResponse->new( availability_zone => $instance_elem->{placement}{availabilityZone} );
 
-				my $tag_sets;
-				foreach my $tag_arr (@{$instance_elem->{tagSet}{item}}) {
-                    if ( ref $tag_arr->{value} eq "HASH" ) {
-                        $tag_arr->{value} = "";
-                    }
-					my $tag = Net::Amazon::EC2::TagSet->new(
-						key => $tag_arr->{key},
-						value => $tag_arr->{value},
-					);
-					push @$tag_sets, $tag;
-				}
-
 				my $running_instance = Net::Amazon::EC2::RunningInstances->new(
 					ami_launch_index		=> $instance_elem->{amiLaunchIndex},
 					dns_name				=> $instance_elem->{dnsName},
@@ -1998,7 +2004,7 @@ sub describe_instances {
 					root_device_type		=> $instance_elem->{rootDeviceType},
 					block_device_mapping	=> $block_device_mappings,
 					state_reason			=> $state_reason,
-					tag_set					=> $tag_sets,
+					tag_set					=> $self->_tag_set($instance_elem),
 				);
 
 				if ($product_codes) {
@@ -2646,6 +2652,7 @@ sub describe_snapshots {
  				volume_size		=> $snap->{volumeSize},
  				description		=> $snap->{description},
  				owner_alias		=> $snap->{ownerAlias},
+				tag_set			=> $self->_tag_set($snap),
  			);
  			
  			push @$snapshots, $snapshot;
@@ -2740,6 +2747,7 @@ sub describe_volumes {
 				encrypted		=> $volume_set->{encrypted},
 				tag_set                 => $tags,
 				attachments		=> $attachments,
+				tag_set			=> $self->_tag_set($volume_set),
 			);
 			
 			push @$volumes, $volume;

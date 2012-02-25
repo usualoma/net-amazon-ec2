@@ -49,6 +49,14 @@ Description of the snapshot.
 
 The AWS account alias (e.g., "amazon", "redhat", "self", etc.) or AWS account ID that owns the AMI.
 
+=item tag_set (optional)
+
+An array ref of Net::Amazon::EC2::TagSet objects.
+
+=item name (optional)
+
+The instance name from tags.
+
 =back
 
 =cut
@@ -62,6 +70,17 @@ has 'owner_id'		=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'volume_size'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'description'	=> ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
 has 'owner_alias'	=> ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
+has 'tag_set'				=> ( is => 'ro', isa => 'Maybe[ArrayRef[Net::Amazon::EC2::TagSet]]', required => 0 );
+has 'name' => (
+	is => 'ro',
+	lazy    => 1,
+	default => sub {
+		my $self = shift;
+		return '' if !$self->tag_set || scalar @{$self->tag_set} == 0;
+		my $name = (grep {$_->{key} eq 'Name'} @{$self->tag_set})[0];
+		return $name->{value} || '';
+	},
+);
 
 __PACKAGE__->meta->make_immutable();
 
