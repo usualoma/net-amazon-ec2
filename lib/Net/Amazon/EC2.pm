@@ -2893,7 +2893,7 @@ sub modify_image_attribute {
 
 =head2 modify_instance_attribute(%params)
 
-Modify an attribute of an instance. Only one attribute can be specified per call.
+Modify an attribute of an instance. 
 
 =over
 
@@ -2929,6 +2929,21 @@ The attribute we want to modify. Valid values are:
 
 The value to set the attribute to.
 
+You may also pass a hashref with one or more keys 
+and values. This hashref will be flattened and 
+passed to AWS.
+
+For example:
+
+  $ec2->modify_instance_attribute(
+        'InstanceId' => $id,
+        'Attribute' => 'blockDeviceMapping',
+        'Value' => {
+            'BlockDeviceMapping.1.DeviceName' => '/dev/sdf1',
+            'BlockDeviceMapping.1.Ebs.DeleteOnTermination' => 'true',
+        }
+  );            
+
 =back
 
 Returns 1 if the modification succeeds.
@@ -2940,8 +2955,14 @@ sub modify_instance_attribute {
 	my %args = validate( @_, {
 		InstanceId	=> { type => SCALAR },
 		Attribute	=> { type => SCALAR },
-		Value		=> { type => SCALAR },
+		Value		=> { type => SCALAR | HASHREF },
 	});
+
+    if ( ref($args{'Value'}) eq "HASH" ) {
+        # remove the 'Value' key and flatten the hashref
+        my $href = delete $args{'Value'};
+        map { $args{$_} = $href->{$_} } keys %{$href};
+    }
 	
 	my $xml = $self->_sign(Action  => 'ModifyInstanceAttribute', %args);
 
