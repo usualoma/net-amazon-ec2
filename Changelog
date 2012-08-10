@@ -1,3 +1,10 @@
+0.19   2012-08-08
+       Miquel Ruiz      Support exceptions via croak
+       Allard Hoeve     Support tagsets on volumes
+       Mark Allen       Allow modify_instance_attribute to use a HASHREF
+                        Fixes RT #78779 (thanks to Andrew Solomon for
+                        the suggestion.)
+
 0.18   2012-02-21      
        Chia-liang Kao   Fix timestamp clear (RT#75194)
 

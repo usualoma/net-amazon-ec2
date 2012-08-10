@@ -60,7 +60,7 @@ use Net::Amazon::EC2::EbsBlockDevice;
 use Net::Amazon::EC2::TagSet;
 use Net::Amazon::EC2::DescribeTags;
 
-$VERSION = '0.18';
+$VERSION = '0.19';
 
 =head1 NAME
 
@@ -69,9 +69,8 @@ environment.
 
 =head1 VERSION
 
-This document describes version 0.18 of Net::Amazon::EC2, released
-February 21, 2012. This module is coded against the Query API version of the '2011-01-01' 
-version of the EC2 API last updated January 1st, 2011.
+This is Net::Amazon::EC2 version 0.19
+EC2 Query API version: '2011-01-01' 
 
 =head1 SYNOPSIS
 
@@ -147,7 +146,12 @@ A flag to turn on debugging. Among other useful things, it will make the failing
 
 =item return_errors (optional)
 
-By default, a failed api call will throw a L<Net::Amazon::EC2::Errors> object. Setting this option to a true value will make the failed calls return the object instead of throwing it. It is turned off by default.
+Previously, Net::Amazon::EC2 would return a L<Net::Amazon::EC2::Errors> 
+object when it encountered an error condition. As of 0.19, this 
+object is thrown as an exception using croak or confess depending on
+if the debug flag is set.
+
+If you want/need the old behavior, set this attribute to a true value.
 
 =back
 
