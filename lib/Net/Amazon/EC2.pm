@@ -222,7 +222,11 @@ sub _sign {
     $ua->env_proxy;
 	my $res	= $ua->post($ur, \%params);
 	# We should force <item> elements to be in an array
-	my $xs	= XML::Simple->new(ForceArray => qr/(?:item|Errors)/i, KeyAttr => '');
+	my $xs	= XML::Simple->new(
+        ForceArray => qr/(?:item|Errors)/i, # Always want item elements unpacked to arrays
+        KeyAttr => '',                      # Turn off folding for 'id', 'name', 'key' elements
+        SuppressEmpty => undef,             # Turn empty values into explicit undefs
+    );
 	my $xml;
 	
 	# Check the result for connectivity problems, if so throw an error
@@ -2613,8 +2617,8 @@ Returns an array ref of Net::Amazon::EC2::DescribeTags objects
 sub describe_tags {
 	my $self = shift;
 	my %args = validate( @_, {
-		'Filter.Name'				=> { type => ARRAYREF | SCALAR },
-		'Filter.Value'				=> { type => ARRAYREF | SCALAR },
+		'Filter.Name'				=> { type => ARRAYREF | SCALAR, optional => 1 },
+		'Filter.Value'				=> { type => ARRAYREF | SCALAR, optional => 1 },
 	});
 
 	if (ref ($args{'Filter.Name'}) eq 'ARRAY') {
