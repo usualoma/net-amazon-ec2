@@ -19,6 +19,7 @@ my $ec2 = eval {
 	SecretAccessKey => $ENV{SECRET_ACCESS_KEY},
 	ssl             => 1,
 	debug           => 0,
+	return_errors   => 1,
     );
 };
 
@@ -26,6 +27,7 @@ $ec2 = Net::Amazon::EC2->new(
 	AWSAccessKeyId  => $ENV{AWS_ACCESS_KEY_ID},
 	SecretAccessKey => $ENV{SECRET_ACCESS_KEY},
 	debug           => 0,
+	return_errors   => 1,
 ) if $@;
 
 isa_ok($ec2, 'Net::Amazon::EC2');
