@@ -227,53 +227,29 @@ sub _sign {
         KeyAttr => '',                      # Turn off folding for 'id', 'name', 'key' elements
         SuppressEmpty => undef,             # Turn empty values into explicit undefs
     );
-	my ($xml, $message, $code);
+	my $xml;
 	
 	# Check the result for connectivity problems, if so throw an error
-	if ($res->is_success and $res->header('Content-Type') eq 'text/xml') {
+ 	if ($res->code >= 500) {
+ 		my $message = $res->status_line;
+		$xml = <<EOXML;
+<xml>
+	<RequestID>N/A</RequestID>
+	<Errors>
+		<Error>
+			<Code>HTTP POST FAILURE</Code>
+			<Message>$message</Message>
+		</Error>
+	</Errors>
+</xml>
+EOXML
+
+ 	}
+	else {
 		$xml = $res->content();
-
-	} else {
-		$message = $res->status_line;
-
-		if ($res->code >= 500) {
-			$code = 'HTTP POST FAILURE';
-		} elsif ($res->code >= 300) {
-			$code = 'CLIENT ERROR';
-		} else {
-			$code = 'UNKNOWN RESPONSE TYPE';
-			$message = $res->content();
-		}
-
-		$xml = <<EOXML;
-<xml>
-	<RequestID>N/A</RequestID>
-	<Errors>
-		<Error>
-			<Code>$code</Code>
-			<Message><![CDATA[$message]]></Message>
-		</Error>
-	</Errors>
-</xml>
-EOXML
 	}
 
-	my $ref = eval { $xs->XMLin($xml); };
-	if ($@) {
-		# The response parsing failed
-		$xml = <<EOXML;
-<xml>
-	<RequestID>N/A</RequestID>
-	<Errors>
-		<Error>
-			<Code>XML PARSING FAILURE</Code>
-			<Message><![CDATA[$@]]></Message>
-		</Error>
-	</Errors>
-</xml>
-EOXML
-		$ref = $xs->XMLin($xml);
-	}
+	my $ref = $xs->XMLin($xml);
 	warn Dumper($ref) . "\n\n" if $self->debug == 1;
 
 	return $ref;

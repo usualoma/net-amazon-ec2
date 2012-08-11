@@ -1,3 +1,6 @@
+0.20   2012-08-10
+       Mark Allen       Stop failing test
+
 0.19   2012-08-08
        Mark Allen       Make filters optional on describe_tags as docs say RT#76140
        Mark Allen       Force XML::Simple to make empty elements undef RT#76139

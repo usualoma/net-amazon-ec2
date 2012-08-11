@@ -14,7 +14,7 @@ BEGIN {
 
 my $access_id  = 'xxx';
 my $secret_key = 'yyy';
-my $base_url   = 'http://localhost';
+my $base_url   = 'http://localhost:22718';
 
 my $die_ec2 = Net::Amazon::EC2->new(
 	AWSAccessKeyId  => $access_id,
