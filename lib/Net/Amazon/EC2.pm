@@ -60,7 +60,7 @@ use Net::Amazon::EC2::EbsBlockDevice;
 use Net::Amazon::EC2::TagSet;
 use Net::Amazon::EC2::DescribeTags;
 
-$VERSION = '0.19';
+$VERSION = '0.20';
 
 =head1 NAME
 
