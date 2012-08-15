@@ -187,13 +187,15 @@ sub _sign {
 	my $self						= shift;
 	my %args						= @_;
 	my $action						= delete $args{Action};
+        my $version						= delete $args{version} || $self->version;
+
 	my %sign_hash					= %args;
 	my $timestamp					= $self->timestamp;
 
 	$sign_hash{AWSAccessKeyId}		= $self->AWSAccessKeyId;
 	$sign_hash{Action}				= $action;
 	$sign_hash{Timestamp}			= $timestamp;
-	$sign_hash{Version}				= $self->version;
+	$sign_hash{Version}				= $version;
 	$sign_hash{SignatureVersion}	= $self->signature_version;
 	my $sign_this;
 
@@ -211,7 +213,7 @@ sub _sign {
 		SignatureVersion	=> $self->signature_version,
 		AWSAccessKeyId		=> $self->AWSAccessKeyId,
 		Timestamp			=> $timestamp,
-		Version				=> $self->version,
+		Version				=> $version,
 		Signature			=> $encoded,
 		%args
 	);
@@ -969,6 +971,16 @@ The optional snapshot id to create the volume from.
 
 The availability zone to create the volume in.
 
+=item VolumeType (optional)
+
+The volume type: 'standard' or 'io1'.  Defaults to 'standard'.
+
+=item Iops (optional)
+
+The number of I/O operations per second (IOPS) that the volume
+supports.  Required when the volume type is io1; not used with
+standard volumes.
+
 =back
 
 Returns a Net::Amazon::EC2::Volume object containing the resulting volume
@@ -982,9 +994,11 @@ sub create_volume {
 		Size				=> { type => SCALAR },
 		SnapshotId			=> { type => SCALAR, optional => 1 },
 		AvailabilityZone	=> { type => SCALAR },
+                VolumeType		=> { type => SCALAR, optional => 1 },
+                Iops			=> { type => SCALAR, optional => 1 },
 	});
 
-	my $xml = $self->_sign(Action  => 'CreateVolume', %args);
+	my $xml = $self->_sign(Action  => 'CreateVolume', %args, version => '2012-07-20');
 
 	
 	if ( grep { defined && length } $xml->{Errors} ) {
@@ -1003,6 +1017,8 @@ sub create_volume {
 			create_time		=> $xml->{createTime},
 			snapshot_id		=> $xml->{snapshotId},
 			size			=> $xml->{size},
+			volume_type		=> $xml->{volumeType},
+			iops			=> $xml->{iops},
 		);
 
 		return $volume;
@@ -2536,7 +2552,7 @@ sub describe_volumes {
 		}
 	}
 	
-	my $xml = $self->_sign(Action  => 'DescribeVolumes', %args);
+	my $xml = $self->_sign(Action  => 'DescribeVolumes', %args, version => '2012-07-20');
 
 	
 	if ( grep { defined && length } $xml->{Errors} ) {
@@ -2583,6 +2599,8 @@ sub describe_volumes {
 				create_time		=> $volume_set->{createTime},
 				snapshot_id		=> $volume_set->{snapshotId},
 				size			=> $volume_set->{size},
+				volume_type		=> $volume_set->{volumeType},
+				iops			=> $volume_set->{iops},
 				tag_set                 => $tags,
 				attachments		=> $attachments,
 			);
@@ -3674,6 +3692,10 @@ Specifies the subnet ID within which to launch the instance(s) for Amazon Virtua
 
 Specifies the idempotent instance id.
 
+=item EbsOptimized (optional)
+
+Whether the instance is optimized for EBS I/O.
+
 =back
 
 Returns a Net::Amazon::EC2::ReservationInfo object
@@ -3706,6 +3728,7 @@ sub run_instances {
 		DisableApiTermination							=> { type => SCALAR, optional => 1 },
 		InstanceInitiatedShutdownBehavior				=> { type => SCALAR, optional => 1 },
 		ClientToken										=> { type => SCALAR, optional => 1 },
+		EbsOptimized										=> { type => SCALAR, optional => 1 },
 	});
 	
 	# If we have a array ref of instances lets split them out into their SecurityGroup.n format
@@ -3768,7 +3791,7 @@ sub run_instances {
 		}
 	}
 
-	my $xml = $self->_sign(Action  => 'RunInstances', %args);
+	my $xml = $self->_sign(Action  => 'RunInstances', %args, version => '2012-07-20');
 	
 	if ( grep { defined && length } $xml->{Errors} ) {
 		return $self->_parse_errors($xml);
