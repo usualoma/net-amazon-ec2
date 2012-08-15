@@ -91,7 +91,8 @@ my $run_result = $ec2->run_instances(
         ImageId         => "ami-26b6534f", # ec2-public-images/developer-image.manifest.xml
         KeyName         => "test_keys", 
         SecurityGroup   => "test_group",
-        InstanceType    => 'm1.small'
+        InstanceType    => 'm1.small',
+        EbsOptimized    => 0,
 );
 isa_ok($run_result, 'Net::Amazon::EC2::ReservationInfo');
 ok($run_result->group_set->[0]->group_name eq "test_group", "Checking for running instance");
