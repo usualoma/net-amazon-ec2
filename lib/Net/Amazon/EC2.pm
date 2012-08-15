@@ -70,7 +70,7 @@ environment.
 =head1 VERSION
 
 This is Net::Amazon::EC2 version 0.19
-EC2 Query API version: '2011-01-01' 
+EC2 Query API version: '2012-07-20'
 
 =head1 SYNOPSIS
 
@@ -161,7 +161,7 @@ has 'AWSAccessKeyId'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'SecretAccessKey'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'debug'				=> ( is => 'ro', isa => 'Str', required => 0, default => 0 );
 has 'signature_version'	=> ( is => 'ro', isa => 'Int', required => 1, default => 1 );
-has 'version'			=> ( is => 'ro', isa => 'Str', required => 1, default => '2011-01-01' );
+has 'version'			=> ( is => 'ro', isa => 'Str', required => 1, default => '2012-07-20' );
 has 'region'			=> ( is => 'ro', isa => 'Str', required => 1, default => 'us-east-1' );
 has 'ssl'				=> ( is => 'ro', isa => 'Bool', required => 1, default => 0 );
 has 'return_errors'     => ( is => 'ro', isa => 'Bool', default => 0 );
@@ -187,15 +187,13 @@ sub _sign {
 	my $self						= shift;
 	my %args						= @_;
 	my $action						= delete $args{Action};
-        my $version						= delete $args{version} || $self->version;
-
 	my %sign_hash					= %args;
 	my $timestamp					= $self->timestamp;
 
 	$sign_hash{AWSAccessKeyId}		= $self->AWSAccessKeyId;
 	$sign_hash{Action}				= $action;
 	$sign_hash{Timestamp}			= $timestamp;
-	$sign_hash{Version}				= $version;
+	$sign_hash{Version}				= $self->version;
 	$sign_hash{SignatureVersion}	= $self->signature_version;
 	my $sign_this;
 
@@ -213,7 +211,7 @@ sub _sign {
 		SignatureVersion	=> $self->signature_version,
 		AWSAccessKeyId		=> $self->AWSAccessKeyId,
 		Timestamp			=> $timestamp,
-		Version				=> $version,
+		Version				=> $self->version,
 		Signature			=> $encoded,
 		%args
 	);
@@ -998,7 +996,7 @@ sub create_volume {
                 Iops			=> { type => SCALAR, optional => 1 },
 	});
 
-	my $xml = $self->_sign(Action  => 'CreateVolume', %args, version => '2012-07-20');
+	my $xml = $self->_sign(Action  => 'CreateVolume', %args);
 
 	
 	if ( grep { defined && length } $xml->{Errors} ) {
@@ -2552,7 +2550,7 @@ sub describe_volumes {
 		}
 	}
 	
-	my $xml = $self->_sign(Action  => 'DescribeVolumes', %args, version => '2012-07-20');
+	my $xml = $self->_sign(Action  => 'DescribeVolumes', %args);
 
 	
 	if ( grep { defined && length } $xml->{Errors} ) {
@@ -3791,7 +3789,7 @@ sub run_instances {
 		}
 	}
 
-	my $xml = $self->_sign(Action  => 'RunInstances', %args, version => '2012-07-20');
+	my $xml = $self->_sign(Action  => 'RunInstances', %args);
 	
 	if ( grep { defined && length } $xml->{Errors} ) {
 		return $self->_parse_errors($xml);
