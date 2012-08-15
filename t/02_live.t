@@ -103,7 +103,9 @@ my $running_instances = $ec2->describe_instances();
 my $seen_test_instance = 0;
 foreach my $instance (@{$running_instances}) {
     my $instance_set = $instance->instances_set->[0];
-    if ($instance_set->key_name eq "test_keys" and $instance_set->image_id eq "ami-26b6534f") {
+    my $key_name = $instance_set->key_name || '';
+    my $image_id = $instance_set->image_id || '';
+    if ($key_name eq 'test_keys' and $image_id eq 'ami-26b6534f') {
         $seen_test_instance = 1;
     }
 }
