@@ -1106,8 +1106,7 @@ Deletes the snapshots passed in. It takes the following arguments:
 
 =item SnapshotId (required)
 
-Either a scalar or array ref of snapshot id's can be passed in. Will delete the corresponding
-snapshots.
+A snapshot id can be passed in. Will delete the corresponding snapshot.
 
 =back
 
@@ -1118,22 +1117,11 @@ Returns true if the deleting succeeded.
 sub delete_snapshot {
 	my $self = shift;
 	my %args = validate( @_, {
-		SnapshotId	=> { type => ARRAYREF | SCALAR },
+		SnapshotId	=> { type => SCALAR },
 	});
 
-	# If we have a array ref of volumes lets split them out into their SnapshotId.n format
-	if (ref ($args{SnapshotId}) eq 'ARRAY') {
-		my $snapshots		= delete $args{SnapshotId};
-		my $count			= 1;
-		foreach my $snapshot (@{$snapshots}) {
-			$args{"SnapshotId." . $count} = $snapshot;
-			$count++;
-		}
-	}
-	
 	my $xml = $self->_sign(Action  => 'DeleteSnapshot', %args);
 
-	
 	if ( grep { defined && length } $xml->{Errors} ) {
 		return $self->_parse_errors($xml);
 	}
