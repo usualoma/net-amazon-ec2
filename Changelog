@@ -1,3 +1,8 @@
+0.21   2012-10-18
+       Stephen Caldwell Support VolumeType and Iops on EBS volumes
+       Mark Allen       DeleteSnapshot does not take an array (Github Issue #13) 
+       Mark Allen       Allow undef in TagSet values (RT#80071)
+
 0.20   2012-08-10
        Mark Allen       Stop failing test
 

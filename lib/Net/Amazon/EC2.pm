@@ -60,7 +60,7 @@ use Net::Amazon::EC2::EbsBlockDevice;
 use Net::Amazon::EC2::TagSet;
 use Net::Amazon::EC2::DescribeTags;
 
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 =head1 NAME
 
@@ -69,7 +69,8 @@ environment.
 
 =head1 VERSION
 
-This is Net::Amazon::EC2 version 0.19
+This is Net::Amazon::EC2 version 0.21
+
 EC2 Query API version: '2012-07-20'
 
 =head1 SYNOPSIS
