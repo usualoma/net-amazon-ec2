@@ -1,4 +1,6 @@
-0.21   2012-10-18
+0.21   2012-10-22
+       Mark Allen       Allow undef or arrayref in AvailabilityZone
+       Mark Phillips    Update InstanceType docs
        Stephen Caldwell Support VolumeType and Iops on EBS volumes
        Mark Allen       DeleteSnapshot does not take an array (Github Issue #13) 
        Mark Allen       Allow undef in TagSet values (RT#80071)
