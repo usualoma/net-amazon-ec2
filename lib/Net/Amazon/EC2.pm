@@ -4192,9 +4192,11 @@ machine instance usage charges (since there are 2 instances started) which as of
 Important note about the windows-only methods.  These have not been well tested as I do not run windows-based instances, so exercise
 caution in using these.
 
-=head1 TODO
+=head1 BUGS
 
-Need to add in support for Spot Instances.
+Please report any bugs or feature requests to C<bug-net-amazon-ec2 at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Amazon-EC2>.  I will 
+be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 AUTHOR
 
@@ -4202,13 +4204,23 @@ Jeff Kim <cpan@chosec.com>
 
 =head1 CONTRIBUTORS
 
-John McCullough
+John McCullough and others as listed in the Changelog
+
+=head1 MAINTAINER
+
+The current maintainer is Mark Allen C<< <mallen@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2010 Jeff Kim. This program is free software; you can redistribute it and/or modify it
+Copyright (c) 2006-2010 Jeff Kim. 
+
+Copyright (c) 2012 Mark Allen.
+
+This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
 Amazon EC2 API: L<http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/>
+
+=cut
