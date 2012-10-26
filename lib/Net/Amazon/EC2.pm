@@ -6,12 +6,14 @@ use vars qw($VERSION);
 
 use XML::Simple;
 use LWP::UserAgent;
-use Digest::HMAC_SHA1;
+use LWP::Protocol::https;
+use Digest::SHA qw(hmac_sha256);
 use URI;
 use MIME::Base64 qw(encode_base64 decode_base64);
-use HTTP::Date qw(time2isoz);
+use POSIX qw(strftime);
 use Params::Validate qw(validate SCALAR ARRAYREF HASHREF);
 use Data::Dumper qw(Dumper);
+use URI::Escape qw(uri_escape uri_escape_utf8);
 use Carp;
 
 use Net::Amazon::EC2::DescribeImagesResponse;
@@ -60,7 +62,7 @@ use Net::Amazon::EC2::EbsBlockDevice;
 use Net::Amazon::EC2::TagSet;
 use Net::Amazon::EC2::DescribeTags;
 
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 =head1 NAME
 
@@ -69,7 +71,7 @@ environment.
 
 =head1 VERSION
 
-This is Net::Amazon::EC2 version 0.21
+This is Net::Amazon::EC2 version 0.22
 
 EC2 Query API version: '2012-07-20'
 
@@ -161,10 +163,10 @@ If you want/need the old behavior, set this attribute to a true value.
 has 'AWSAccessKeyId'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'SecretAccessKey'	=> ( is => 'ro', isa => 'Str', required => 1 );
 has 'debug'				=> ( is => 'ro', isa => 'Str', required => 0, default => 0 );
-has 'signature_version'	=> ( is => 'ro', isa => 'Int', required => 1, default => 1 );
+has 'signature_version'	=> ( is => 'ro', isa => 'Int', required => 1, default => 2 );
 has 'version'			=> ( is => 'ro', isa => 'Str', required => 1, default => '2012-07-20' );
 has 'region'			=> ( is => 'ro', isa => 'Str', required => 1, default => 'us-east-1' );
-has 'ssl'				=> ( is => 'ro', isa => 'Bool', required => 1, default => 0 );
+has 'ssl'				=> ( is => 'ro', isa => 'Bool', required => 1, default => 1 );
 has 'return_errors'     => ( is => 'ro', isa => 'Bool', default => 0 );
 has 'base_url'			=> ( 
 	is			=> 'ro', 
@@ -177,13 +179,9 @@ has 'base_url'			=> (
 );
 
 sub timestamp {
-	my $ts = time2isoz();
-	chop($ts);
-	$ts .= '.000Z';
-	$ts =~ s/\s+/T/g;
-	return $ts;
-};
-
+    return strftime("%Y-%m-%dT%H:%M:%SZ",gmtime);
+}
+    
 sub _sign {
 	my $self						= shift;
 	my %args						= @_;
@@ -196,20 +194,30 @@ sub _sign {
 	$sign_hash{Timestamp}			= $timestamp;
 	$sign_hash{Version}				= $self->version;
 	$sign_hash{SignatureVersion}	= $self->signature_version;
-	my $sign_this;
+    $sign_hash{SignatureMethod}     = "HmacSHA256";
+
+	my $sign_this = "POST\n";
+	my $uri = URI->new($self->base_url);
+
+    $sign_this .= lc($uri->host) . "\n";
+    $sign_this .= "/\n";
+
+    my @signing_elements;
 
 	# The sign string must be alphabetical in a case-insensitive manner.
-	foreach my $key (sort { lc($a) cmp lc($b) } keys %sign_hash) {
-		$sign_this .= $key . $sign_hash{$key};
+	foreach my $key (sort keys %sign_hash) {
+		push @signing_elements, uri_escape_utf8($key)."=".uri_escape_utf8($sign_hash{$key});
 	}
+
+    $sign_this .= join "&", @signing_elements;
 
 	$self->_debug("QUERY TO SIGN: $sign_this");
 	my $encoded = $self->_hashit($self->SecretAccessKey, $sign_this);
 
-	my $uri = URI->new($self->base_url);
 	my %params = (
 		Action				=> $action,
 		SignatureVersion	=> $self->signature_version,
+        SignatureMethod     => "HmacSHA256",
 		AWSAccessKeyId		=> $self->AWSAccessKeyId,
 		Timestamp			=> $timestamp,
 		Version				=> $self->version,
@@ -307,12 +315,8 @@ sub _debug {
 sub _hashit {
 	my $self								= shift;
 	my ($secret_access_key, $query_string)	= @_;
-	my $hashed								= Digest::HMAC_SHA1->new($secret_access_key);
-	$hashed->add($query_string);
 	
-	my $encoded = encode_base64($hashed->digest, '');
-
-	return $encoded;
+	return encode_base64(hmac_sha256($query_string, $secret_access_key), '');
 }
 
 sub _build_filters {
