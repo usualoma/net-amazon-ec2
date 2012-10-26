@@ -1,3 +1,6 @@
+0.22   2012-10-26
+       Mark Allen       Use AWS signature v2 and SSL by default (RT #80407)
+
 0.21   2012-10-22
        Mark Allen       Allow undef or arrayref in AvailabilityZone
        Mark Phillips    Update InstanceType docs

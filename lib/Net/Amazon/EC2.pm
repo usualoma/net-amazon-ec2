@@ -13,7 +13,7 @@ use MIME::Base64 qw(encode_base64 decode_base64);
 use POSIX qw(strftime);
 use Params::Validate qw(validate SCALAR ARRAYREF HASHREF);
 use Data::Dumper qw(Dumper);
-use URI::Escape qw(uri_escape uri_escape_utf8);
+use URI::Escape qw(uri_escape_utf8);
 use Carp;
 
 use Net::Amazon::EC2::DescribeImagesResponse;
@@ -103,17 +103,20 @@ EC2 Query API version: '2012-07-20'
 
  my $result = $ec2->terminate_instances(InstanceId => $instance_id);
 
-If an error occurs while communicating with EC2, these methods will throw a L<Net::Amazon::EC2::Errors> exception.
+If an error occurs while communicating with EC2, these methods will 
+throw a L<Net::Amazon::EC2::Errors> exception.
 
 =head1 DESCRIPTION
 
-This module is a Perl interface to Amazon's Elastic Compute Cloud. It uses the Query API to communicate with Amazon's Web Services framework.
+This module is a Perl interface to Amazon's Elastic Compute Cloud. It uses the Query API to 
+communicate with Amazon's Web Services framework.
 
 =head1 CLASS METHODS
 
 =head2 new(%params)
 
-This is the constructor, it will return you a Net::Amazon::EC2 object to work with.  It takes these parameters:
+This is the constructor, it will return you a Net::Amazon::EC2 object to work with.  It takes 
+these parameters:
 
 =over
 
@@ -123,29 +126,22 @@ Your AWS access key.
 
 =item SecretAccessKey (required)
 
-Your secret key, WARNING! don't give this out or someone will be able to use your account and incur charges on your behalf.
+Your secret key, B<WARNING!> don't give this out or someone will be able to use your account 
+and incur charges on your behalf.
 
 =item region (optional)
 
-The region to run the API requests through. The options are:
-
-=over
-
-=item * us-east-1 - Nothern Virginia
-
-=item * us-west-1 - Northern California
-
-=item * eu-west-1 - Ireland
-
-=back
+The region to run the API requests through. Defaults to us-east-1.
 
 =item ssl (optional)
 
-If set to a true value, the base_url will use https:// instead of http://. Setting base_url explicitly will override this. Use depends on LWP::Protocol::https; if not installed it will die at runtime trying to fetch the url.
+If set to a true value, the base_url will use https:// instead of http://. Setting base_url 
+explicitly will override this. Defaults to true as of 0.22.
 
 =item debug (optional)
 
-A flag to turn on debugging. Among other useful things, it will make the failing api calls print an stack trace. It is turned off by default
+A flag to turn on debugging. Among other useful things, it will make the failing api calls print 
+a stack trace. It is turned off by default.
 
 =item return_errors (optional)
 
@@ -204,7 +200,6 @@ sub _sign {
 
     my @signing_elements;
 
-	# The sign string must be alphabetical in a case-insensitive manner.
 	foreach my $key (sort keys %sign_hash) {
 		push @signing_elements, uri_escape_utf8($key)."=".uri_escape_utf8($sign_hash{$key});
 	}
