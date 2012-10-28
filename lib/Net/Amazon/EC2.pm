@@ -481,7 +481,8 @@ The CIDR IP space we are adding access for.
 
 =back
 
-Adding a rule can be done in two ways: adding a source group name + source group owner id, or, by Protocol + start port + end port + CIDR IP.  The two are mutally exclusive.
+Adding a rule can be done in two ways: adding a source group name + source group owner id, or, 
+CIDR IP range. Both methods allow IP protocol, from port and to port specifications.
 
 Returns 1 if rule is added successfully.
 
@@ -499,7 +500,7 @@ sub authorize_security_group_ingress {
 		SourceSecurityGroupOwnerId	=> { type => SCALAR, optional => 1 },
 		IpProtocol 					=> { 
 			type => SCALAR,
-			depends => ['FromPort', 'ToPort', 'CidrIp'],
+			depends => ['FromPort', 'ToPort'],
 			optional => 1 
 		},
 		FromPort 					=> { type => SCALAR, optional => 1 },
