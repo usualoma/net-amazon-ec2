@@ -363,9 +363,13 @@ Associates an elastic IP address with an instance. It takes the following argume
 
 The instance id you wish to associate the IP address with
 
-=item PublicIp (required)
+=item PublicIp (optional)
 
 The IP address to associate with
+
+=item AllocationId (optional)
+
+The allocation id if IP will be assigned in a virtual private cloud.
 
 =back
 
@@ -377,7 +381,8 @@ sub associate_address {
 	my $self = shift;
 	my %args = validate( @_, {
 		InstanceId		=> { type => SCALAR },
-		PublicIp 		=> { type => SCALAR },
+		PublicIp 		=> { type => SCALAR, optional => 1 },
+		AllocationId		=> { type => SCALAR, optional => 1 },
 	});
 	
 	my $xml = $self->_sign(Action  => 'AssociateAddress', %args);
