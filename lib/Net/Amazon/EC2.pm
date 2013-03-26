@@ -2556,6 +2556,13 @@ The owner of the snapshot.
 
 A user who can create volumes from the snapshot.
 
+=item Filter (optional)
+
+The filters for only the matching snapshots to be 'described'.  A
+filter tuple is an arrayref constsing one key and one or more values.
+The option takes one filter tuple, or an arrayref of multiple filter
+tuples.
+
 =back
 
 Returns an array ref of Net::Amazon::EC2::Snapshot objects.
@@ -2568,7 +2575,10 @@ sub describe_snapshots {
 		SnapshotId		=> { type => ARRAYREF | SCALAR, optional => 1 },
 		Owner			=> { type => SCALAR, optional => 1 },
 		RestorableBy	=> { type => SCALAR, optional => 1 },
+		Filter		=> { type => ARRAYREF, optional => 1 },
 	});
+
+	$self->_build_filters(\%args);
 
 	# If we have a array ref of volumes lets split them out into their SnapshotId.n format
 	if (ref ($args{SnapshotId}) eq 'ARRAY') {
