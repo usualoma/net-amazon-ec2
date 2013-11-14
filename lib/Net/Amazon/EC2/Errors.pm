@@ -23,6 +23,8 @@ An array ref of Net::Amazon::EC2::Error objects associated with this request.
 
 =cut
 
+use overload '""' => 'as_string';
+
 has 'request_id'    => ( is => 'ro', isa => 'Str', required => 1 );
 has 'errors'        => ( 
     is          => 'rw', 
@@ -30,6 +32,12 @@ has 'errors'        => (
     predicate   => 'has_errors',
     required    => 1,
 );
+
+sub as_string {
+  my $self = shift;
+  my $errors = join '', map { '['.$_->code.'] '.$_->message."\n" } @{$self->errors};
+  return "Amazon EC2 Errors [Request ".$self->request_id."]:\n$errors"
+}
 
 __PACKAGE__->meta->make_immutable();
 
