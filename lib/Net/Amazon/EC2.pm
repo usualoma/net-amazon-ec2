@@ -209,22 +209,13 @@ sub _sign {
 	$self->_debug("QUERY TO SIGN: $sign_this");
 	my $encoded = $self->_hashit($self->SecretAccessKey, $sign_this);
 
-	my %params = (
-		Action				=> $action,
-		SignatureVersion	=> $self->signature_version,
-        SignatureMethod     => "HmacSHA256",
-		AWSAccessKeyId		=> $self->AWSAccessKeyId,
-		Timestamp			=> $timestamp,
-		Version				=> $self->version,
-		Signature			=> $encoded,
-		%args
-	);
-	
+    my $content = join "&", @signing_elements, 'Signature=' . uri_escape_utf8($encoded);
+
 	my $ur	= $uri->as_string();
 	$self->_debug("GENERATED QUERY URL: $ur");
 	my $ua	= LWP::UserAgent->new();
     $ua->env_proxy;
-	my $res	= $ua->post($ur, \%params);
+	my $res	= $ua->post($ur, Content => $content);
 	# We should force <item> elements to be in an array
 	my $xs	= XML::Simple->new(
         ForceArray => qr/(?:item|Errors)/i, # Always want item elements unpacked to arrays
