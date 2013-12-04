@@ -120,11 +120,11 @@ these parameters:
 
 =over
 
-=item AWSAccessKeyId (required)
+=item AWSAccessKeyId (required, unless an IAM role is present)
 
-Your AWS access key.
+Your AWS access key.  For information on IAM roles, see L<http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UsingIAM.html#UsingIAMrolesWithAmazonEC2Instances>
 
-=item SecretAccessKey (required)
+=item SecretAccessKey (required, unless an IAM role is present)
 
 Your secret key, B<WARNING!> don't give this out or someone will be able to use your account 
 and incur charges on your behalf.
@@ -156,8 +156,30 @@ If you want/need the old behavior, set this attribute to a true value.
 
 =cut
 
-has 'AWSAccessKeyId'	=> ( is => 'ro', isa => 'Str', required => 1 );
-has 'SecretAccessKey'	=> ( is => 'ro', isa => 'Str', required => 1 );
+has 'AWSAccessKeyId'	=> ( is => 'ro',
+			     isa => 'Str',
+			     required => 1,
+			     lazy => 1,
+			     default => sub {
+				 if (defined($_[0]->temp_creds)) {
+				     return $_[0]->temp_creds->{'AccessKeyId'};
+				 } else {
+				     return undef;
+				 }
+			     }
+);
+has 'SecretAccessKey'	=> ( is => 'ro',
+			     isa => 'Str',
+			     required => 1,
+			     lazy => 1,
+			     default => sub {
+				 if (defined($_[0]->temp_creds)) {
+				     return $_[0]->temp_creds->{'SecretAccessKey'};
+				 } else {
+				     return undef;
+				 }
+			     }
+);
 has 'debug'				=> ( is => 'ro', isa => 'Str', required => 0, default => 0 );
 has 'signature_version'	=> ( is => 'ro', isa => 'Int', required => 1, default => 2 );
 has 'version'			=> ( is => 'ro', isa => 'Str', required => 1, default => '2012-07-20' );
@@ -173,11 +195,56 @@ has 'base_url'			=> (
 		return 'http' . ($_[0]->ssl ? 's' : '') . '://' . $_[0]->region . '.ec2.amazonaws.com';
 	}
 );
+has 'temp_creds'       => ( is => 'ro',
+			     lazy => 1,
+			     default => sub {
+				 my $ret;
+				 $ret = $_[0]->_fetch_iam_security_credentials();
+			     },
+			     predicate => 'has_temp_creds'
+);
+
 
 sub timestamp {
     return strftime("%Y-%m-%dT%H:%M:%SZ",gmtime);
 }
+
+sub _fetch_iam_security_credentials {
+    my $self = shift;
+    my $retval = {};
+
+    my $ua = LWP::UserAgent->new();
+    # Fail quickly if this is not running on an EC2 instance
+    $ua->timeout(2);
+
+    my $url = 'http://169.254.169.254/latest/meta-data/iam/security-credentials/';
     
+    $self->_debug("Attempting to fetch instance credentials");
+
+    my $res = $ua->get($url);
+    if ($res->code == 200) {
+	# Assumes the first profile is the only profile
+	my $profile = (split /\n/, $res->content())[0];
+
+	$res = $ua->get($url . $profile);
+
+	if ($res->code == 200) {
+	    $retval->{'Profile'} = $profile;
+	    foreach (split /\n/, $res->content()) {
+		return undef if /Code/ && !/Success/;
+		if (m/.*"([^"]+)"\s+:\s+"([^"]+)",/) {
+		    $retval->{$1} = $2;
+		}
+	    }
+
+	    return $retval if (keys %{$retval});
+	}
+	 
+    }
+   
+    return undef;
+}
+
 sub _sign {
 	my $self						= shift;
 	my %args						= @_;
@@ -191,6 +258,10 @@ sub _sign {
 	$sign_hash{Version}				= $self->version;
 	$sign_hash{SignatureVersion}	= $self->signature_version;
     $sign_hash{SignatureMethod}     = "HmacSHA256";
+	if ($self->has_temp_creds) {
+	    $sign_hash{SecurityToken} = $self->temp_creds->{'Token'};
+	}
+
 
 	my $sign_this = "POST\n";
 	my $uri = URI->new($self->base_url);
