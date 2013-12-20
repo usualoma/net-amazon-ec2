@@ -129,6 +129,11 @@ Your AWS access key.  For information on IAM roles, see L<http://docs.aws.amazon
 Your secret key, B<WARNING!> don't give this out or someone will be able to use your account 
 and incur charges on your behalf.
 
+=item SecurityToken (optional)
+
+When using temporary credentials from STS the Security Token must be passed
+in along with the temporary AWSAccessKeyId and SecretAccessKey.  The most common case is when using IAM credentials with the addition of MFA (multi-factor authentication).  See L<http://docs.aws.amazon.com/STS/latest/UsingSTS/Welcome.html>
+
 =item region (optional)
 
 The region to run the API requests through. Defaults to us-east-1.
@@ -175,6 +180,19 @@ has 'SecretAccessKey'	=> ( is => 'ro',
 			     default => sub {
 				 if (defined($_[0]->temp_creds)) {
 				     return $_[0]->temp_creds->{'SecretAccessKey'};
+				 } else {
+				     return undef;
+				 }
+			     }
+);
+has 'SecurityToken'	=> ( is => 'ro',
+			     isa => 'Str',
+			     required => 0,
+			     lazy => 1,
+			     predicate => 'has_SecurityToken',
+			     default => sub {
+				 if (defined($_[0]->temp_creds)) {
+				     return $_[0]->temp_creds->{'Token'};
 				 } else {
 				     return undef;
 				 }
@@ -258,8 +276,8 @@ sub _sign {
 	$sign_hash{Version}				= $self->version;
 	$sign_hash{SignatureVersion}	= $self->signature_version;
     $sign_hash{SignatureMethod}     = "HmacSHA256";
-	if ($self->has_temp_creds) {
-	    $sign_hash{SecurityToken} = $self->temp_creds->{'Token'};
+	if ($self->has_temp_creds || $self->has_SecurityToken) {
+	    $sign_hash{SecurityToken} = $self->SecurityToken;
 	}
 
 
