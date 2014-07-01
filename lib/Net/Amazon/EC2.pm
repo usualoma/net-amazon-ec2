@@ -3894,6 +3894,7 @@ sub run_instances {
 		'BlockDeviceMapping.DeviceName'					=> { type => SCALAR | ARRAYREF, optional => 1 },
 		'BlockDeviceMapping.Ebs.SnapshotId'				=> { type => SCALAR | ARRAYREF, optional => 1 },
 		'BlockDeviceMapping.Ebs.VolumeSize'				=> { type => SCALAR | ARRAYREF, optional => 1 },
+		'BlockDeviceMapping.Ebs.VolumeType'				=> { type => SCALAR | ARRAYREF, optional => 1 },
 		'BlockDeviceMapping.Ebs.DeleteOnTermination'	=> { type => SCALAR | ARRAYREF, optional => 1 },
 		Encoding										=> { type => SCALAR, optional => 1 },
 		Version											=> { type => SCALAR, optional => 1 },
@@ -3965,6 +3966,16 @@ sub run_instances {
 		my $count			= 1;
 		foreach my $volume_size (@{$volume_sizes}) {
 			$args{"BlockDeviceMapping." . $count . ".Ebs.VolumeSize"} = $volume_size;
+			$count++;
+		}
+	}
+
+	# If we have a array ref of block device EBS VolumeTypes lets split them out into their BlockDeviceMapping.n.Ebs.VolumeType format
+	if (ref ($args{'BlockDeviceMapping.Ebs.VolumeType'}) eq 'ARRAY') {
+		my $volume_types	= delete $args{'BlockDeviceMapping.Ebs.VolumeType'};
+		my $count			= 1;
+		foreach my $volume_type (@{$volume_types}) {
+			$args{"BlockDeviceMapping." . $count . ".Ebs.VolumeType"} = $volume_type;
 			$count++;
 		}
 	}
