@@ -2914,7 +2914,9 @@ A scalar containing a instance id.
 
 =back
 
-Returns a Net::Amazon::EC2::ConsoleOutput object.
+Returns a Net::Amazon::EC2::ConsoleOutput object or C<undef> if there is no
+new output. (This can happen in cases where the console output has not changed
+since the last call.)
 
 =cut
 
@@ -2931,13 +2933,17 @@ sub get_console_output {
 		return $self->_parse_errors($xml);
 	}
 	else {
-		my $console_output = Net::Amazon::EC2::ConsoleOutput->new(
-			instance_id	=> $xml->{instanceId},
-			timestamp	=> $xml->{timestamp},
-			output		=> decode_base64($xml->{output}),
-		);
-		
-		return $console_output;
+		if ( grep { defined && length } $xml->{output} ) {
+			my $console_output = Net::Amazon::EC2::ConsoleOutput->new(
+				instance_id	=> $xml->{instanceId},
+				timestamp	=> $xml->{timestamp},
+				output		=> decode_base64($xml->{output}),
+			);
+			return $console_output;
+		}
+		else {
+			return undef;
+		}
 	}
 }
 
