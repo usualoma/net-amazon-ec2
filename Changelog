@@ -1,3 +1,12 @@
+0.25   2014-07-02 
+       Steve Caldwell   Support VolumeType param to BlockDeviceMapping
+       Mark Allen       Fix POD to use proper case for arguments in
+                        register_image (RT #88379)
+       Mark Allen       Return undef when no new console output is available
+                        from the get_console_output call instead of returning
+                        garbage. (RT #67748)
+       Mark Allen       Fix delete_security_group() failing test
+
 0.24   2013-12-08      
        Jim Browne       Add filter support to describe_snapshots
        Jim Browne       Add support for IAM roles (RT #81664)
