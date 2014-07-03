@@ -62,7 +62,7 @@ use Net::Amazon::EC2::EbsBlockDevice;
 use Net::Amazon::EC2::TagSet;
 use Net::Amazon::EC2::DescribeTags;
 
-$VERSION = '0.24_01';
+$VERSION = '0.25';
 
 =head1 NAME
 
@@ -71,7 +71,7 @@ environment.
 
 =head1 VERSION
 
-This is Net::Amazon::EC2 version 0.24
+This is Net::Amazon::EC2 version 0.25
 
 EC2 Query API version: '2012-07-20'
 
@@ -3398,7 +3398,7 @@ This needs to be a data structure like this:
 [
 	{
 		deviceName	=> "/dev/sdh", (optional)
-		virtualName	=> "ephermel0", (optional)
+		virtualName	=> "ephemerel0", (optional)
 		noDevice	=> "/dev/sdl", (optional),
 		ebs			=> {
 			snapshotId			=> "snap-0000", (optional)
