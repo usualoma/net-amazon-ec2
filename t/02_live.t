@@ -200,10 +200,6 @@ is($terminate_result->[0]->instance_id, $instance_id, "Checking to see if instan
 $delete_key_result = $ec2->delete_key_pair(KeyName => "test_keys");
 ok($delete_key_result == 1, "Deleting key pair");
 
-# delete_security_group
-$delete_group_result = $ec2->delete_security_group(GroupName => "test_group");
-ok($delete_group_result == 1, "Deleting security group");
-
 my $availability_zones = $ec2->describe_availability_zones();
 my $seen_availability_zone = 0;
 foreach my $availability_zone (@{$availability_zones}) {
@@ -230,5 +226,19 @@ foreach my $offering (@{$reserved_instance_offerings}) {
 	}
 }
 ok($seen_offering == 1, "Describing Reserved Instances Offerings");
+
+# delete_security_group
+while (1) {
+    $delete_group_result = $ec2->delete_security_group(GroupName => "test_group");
+    if ( ref($delete_group_result) =~ /Error/ ) {
+        # If we get an error, loop until we don't
+        sleep 5;
+        next;
+    }
+    else {
+        last;
+    }
+}
+ok($delete_group_result == 1, "Deleting security group");
 
 # THE REST OF THE METHODS ARE SKIPPED FOR NOW SINCE IT WOULD REQUIRE A DECENT AMOUNT OF TIME IN BETWEEN OPERATIONS TO COMPLETE
