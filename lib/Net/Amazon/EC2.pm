@@ -3363,39 +3363,39 @@ This method registers an AMI on the EC2. It takes the following parameter:
 
 =over
 
-=item imageLocation (optional)
+=item ImageLocation (optional)
 
 The location of the AMI manifest on S3
 
-=item name (required)
+=item Name (required)
 
 The name of the AMI that was provided during image creation.
 
-=item description (optional)
+=item Description (optional)
 
 The description of the AMI.
 
-=item architecture (optional)
+=item Architecture (optional)
 
 The architecture of the image. Either i386 or x86_64
 
-=item kernelId (optional)
+=item KernelId (optional)
 
 The ID of the kernel to select. 
 
-=item ramdiskId (optional)
+=item RamdiskId (optional)
 
 The ID of the RAM disk to select. Some kernels require additional drivers at launch. 
 
-=item rootDeviceName (optional)
+=item RootDeviceName (optional)
 
 The root device name (e.g., /dev/sda1).
 
-=item blockDeviceMapping (optional)
+=item BlockDeviceMapping (optional)
 
 This needs to be a data structure like this:
 
-[
+ [
 	{
 		deviceName	=> "/dev/sdh", (optional)
 		virtualName	=> "ephemerel0", (optional)
@@ -3407,7 +3407,7 @@ This needs to be a data structure like this:
 		},
 	},
 	...
-]	
+ ]	
 
 =back
 
