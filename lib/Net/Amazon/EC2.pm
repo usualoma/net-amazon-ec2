@@ -3941,7 +3941,7 @@ sub run_instances {
 		my $virtual_names	= delete $args{'BlockDeviceMapping.VirtualName'};
 		my $count			= 1;
 		foreach my $virtual_name (@{$virtual_names}) {
-			$args{"BlockDeviceMapping." . $count . ".VirtualName"} = $virtual_name;
+			$args{"BlockDeviceMapping." . $count . ".VirtualName"} = $virtual_name if defined($virtual_name);
 			$count++;
 		}
 	}
@@ -3951,7 +3951,7 @@ sub run_instances {
 		my $device_names	= delete $args{'BlockDeviceMapping.DeviceName'};
 		my $count			= 1;
 		foreach my $device_name (@{$device_names}) {
-			$args{"BlockDeviceMapping." . $count . ".DeviceName"} = $device_name;
+			$args{"BlockDeviceMapping." . $count . ".DeviceName"} = $device_name if defined($device_name);
 			$count++;
 		}
 	}
@@ -3961,7 +3961,7 @@ sub run_instances {
 		my $snapshot_ids	= delete $args{'BlockDeviceMapping.Ebs.SnapshotId'};
 		my $count			= 1;
 		foreach my $snapshot_id (@{$snapshot_ids}) {
-			$args{"BlockDeviceMapping." . $count . ".Ebs.SnapshotId"} = $snapshot_id;
+			$args{"BlockDeviceMapping." . $count . ".Ebs.SnapshotId"} = $snapshot_id if defined($snapshot_id);
 			$count++;
 		}
 	}
@@ -3971,7 +3971,7 @@ sub run_instances {
 		my $volume_sizes	= delete $args{'BlockDeviceMapping.Ebs.VolumeSize'};
 		my $count			= 1;
 		foreach my $volume_size (@{$volume_sizes}) {
-			$args{"BlockDeviceMapping." . $count . ".Ebs.VolumeSize"} = $volume_size;
+			$args{"BlockDeviceMapping." . $count . ".Ebs.VolumeSize"} = $volume_size if defined($volume_size);
 			$count++;
 		}
 	}
@@ -3981,7 +3981,7 @@ sub run_instances {
 		my $volume_types	= delete $args{'BlockDeviceMapping.Ebs.VolumeType'};
 		my $count			= 1;
 		foreach my $volume_type (@{$volume_types}) {
-			$args{"BlockDeviceMapping." . $count . ".Ebs.VolumeType"} = $volume_type;
+			$args{"BlockDeviceMapping." . $count . ".Ebs.VolumeType"} = $volume_type if defined($volume_type);
 			$count++;
 		}
 	}
