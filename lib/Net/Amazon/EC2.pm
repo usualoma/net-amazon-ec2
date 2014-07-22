@@ -2332,7 +2332,9 @@ ID of the Reserved Instances to describe.
 
 =item InstanceType (optional)
 
-The instance type on which the Reserved Instance can be used.
+The instance type. The default is m1.small. Amazon frequently updates their instance types.
+
+See http://aws.amazon.com/ec2/instance-types
 
 =item AvailabilityZone (optional)
 
