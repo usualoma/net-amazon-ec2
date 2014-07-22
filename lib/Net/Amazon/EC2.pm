@@ -73,7 +73,7 @@ environment.
 
 This is Net::Amazon::EC2 version 0.25
 
-EC2 Query API version: '2012-07-20'
+EC2 Query API version: '2014-06-15'
 
 =head1 SYNOPSIS
 
@@ -200,7 +200,7 @@ has 'SecurityToken'	=> ( is => 'ro',
 );
 has 'debug'				=> ( is => 'ro', isa => 'Str', required => 0, default => 0 );
 has 'signature_version'	=> ( is => 'ro', isa => 'Int', required => 1, default => 2 );
-has 'version'			=> ( is => 'ro', isa => 'Str', required => 1, default => '2012-07-20' );
+has 'version'			=> ( is => 'ro', isa => 'Str', required => 1, default => '2014-06-15' );
 has 'region'			=> ( is => 'ro', isa => 'Str', required => 1, default => 'us-east-1' );
 has 'ssl'				=> ( is => 'ro', isa => 'Bool', required => 1, default => 1 );
 has 'return_errors'     => ( is => 'ro', isa => 'Bool', default => 0 );
@@ -1109,6 +1109,12 @@ The number of I/O operations per second (IOPS) that the volume
 supports.  Required when the volume type is io1; not used with
 standard volumes.
 
+=item Encrypted (optional)
+
+Encrypt the volume. EBS encrypted volumes are encrypted on the host using
+AWS managed keys. Only some instance types support encrypted volumes. At the
+time of writing encrypted volumes are not supported for boot volumes.
+
 =back
 
 Returns a Net::Amazon::EC2::Volume object containing the resulting volume
@@ -1124,6 +1130,8 @@ sub create_volume {
 		AvailabilityZone	=> { type => SCALAR },
                 VolumeType		=> { type => SCALAR, optional => 1 },
                 Iops			=> { type => SCALAR, optional => 1 },
+                Encrypted               => { type => SCALAR, optional => 1 },
+
 	});
 
 	my $xml = $self->_sign(Action  => 'CreateVolume', %args);
@@ -1147,6 +1155,7 @@ sub create_volume {
 			size			=> $xml->{size},
 			volume_type		=> $xml->{volumeType},
 			iops			=> $xml->{iops},
+			encrypted		=> $xml->{encrypted},
 		);
 
 		return $volume;
@@ -2323,7 +2332,9 @@ ID of the Reserved Instances to describe.
 
 =item InstanceType (optional)
 
-The instance type on which the Reserved Instance can be used.
+The instance type. The default is m1.small. Amazon frequently updates their instance types.
+
+See http://aws.amazon.com/ec2/instance-types
 
 =item AvailabilityZone (optional)
 
@@ -2726,6 +2737,7 @@ sub describe_volumes {
 				size			=> $volume_set->{size},
 				volume_type		=> $volume_set->{volumeType},
 				iops			=> $volume_set->{iops},
+				encrypted		=> $volume_set->{encrypted},
 				tag_set                 => $tags,
 				attachments		=> $attachments,
 			);
