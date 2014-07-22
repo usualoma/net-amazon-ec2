@@ -9,7 +9,7 @@ BEGIN {
         plan skip_all => "Set AWS_ACCESS_KEY_ID and SECRET_ACCESS_KEY environment variables to run these _LIVE_ tests (NOTE: they will incur one instance hour of costs from EC2)";
     }
     else {
-        plan tests => 25;
+        plan tests => 28;
         use_ok( 'Net::Amazon::EC2' );
     }
 };
@@ -240,5 +240,20 @@ while (1) {
     }
 }
 ok($delete_group_result == 1, "Deleting security group");
+
+# create_volume
+my $volume = $ec2->create_volume(
+        Size             => 1,
+        AvailabilityZone => 'us-east-1a',
+        Encrypted        => 'true',
+);
+isa_ok($volume, 'Net::Amazon::EC2::Volume');
+
+my $describe_volume = $ec2->describe_volumes( { VolumeId => $volume->volume_id } );
+ok($describe_volume->[0]->volume_id, $volume->volume_id);
+
+my $delete_volume = $ec2->delete_volume( { VolumeId => $volume->volume_id } );
+ok($delete_volume == 1, "Deleting volume");
+
 
 # THE REST OF THE METHODS ARE SKIPPED FOR NOW SINCE IT WOULD REQUIRE A DECENT AMOUNT OF TIME IN BETWEEN OPERATIONS TO COMPLETE

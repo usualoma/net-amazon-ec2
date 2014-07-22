@@ -1109,6 +1109,12 @@ The number of I/O operations per second (IOPS) that the volume
 supports.  Required when the volume type is io1; not used with
 standard volumes.
 
+=item Encrypted (optional)
+
+Encrypt the volume. EBS encrypted volumes are encrypted on the host using
+AWS managed keys. Only some instance types support encrypted volumes. At the
+time of writing encrypted volumes are not supported for boot volumes.
+
 =back
 
 Returns a Net::Amazon::EC2::Volume object containing the resulting volume
@@ -1124,6 +1130,8 @@ sub create_volume {
 		AvailabilityZone	=> { type => SCALAR },
                 VolumeType		=> { type => SCALAR, optional => 1 },
                 Iops			=> { type => SCALAR, optional => 1 },
+                Encrypted               => { type => SCALAR, optional => 1 },
+
 	});
 
 	my $xml = $self->_sign(Action  => 'CreateVolume', %args);
@@ -1147,6 +1155,7 @@ sub create_volume {
 			size			=> $xml->{size},
 			volume_type		=> $xml->{volumeType},
 			iops			=> $xml->{iops},
+			encrypted		=> $xml->{encrypted},
 		);
 
 		return $volume;
@@ -2726,6 +2735,7 @@ sub describe_volumes {
 				size			=> $volume_set->{size},
 				volume_type		=> $volume_set->{volumeType},
 				iops			=> $volume_set->{iops},
+				encrypted		=> $volume_set->{encrypted},
 				tag_set                 => $tags,
 				attachments		=> $attachments,
 			);
